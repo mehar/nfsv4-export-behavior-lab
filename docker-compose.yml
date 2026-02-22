@@ -1,0 +1,94 @@
+name: nfsv4-export-behavior-lab
+
+services:
+  nfs-server-root-squash:
+    build:
+      context: ./nfs-server
+    container_name: nfs-server-root-squash
+    hostname: nfs-server-root-squash
+    privileged: true
+    environment:
+      PSEUDO_ROOT_SQUASH: root_squash
+      EXPORT_SET: root_squash_only
+    volumes:
+      - nfs_data_root_squash:/exports
+
+  nfs-server-all-squash-ubuntu:
+    build:
+      context: ./nfs-server
+    container_name: nfs-server-all-squash-ubuntu
+    hostname: nfs-server-all-squash-ubuntu
+    privileged: true
+    environment:
+      PSEUDO_ROOT_SQUASH: all_squash
+      PSEUDO_ROOT_ANON_PROFILE: ubuntu
+      EXPORT_SET: all_squash_only
+      ANON_PROFILE_FILTER: ubuntu
+    volumes:
+      - nfs_data_all_squash_ubuntu:/exports
+
+  nfs-server-all-squash-redhat:
+    build:
+      context: ./nfs-server
+    container_name: nfs-server-all-squash-redhat
+    hostname: nfs-server-all-squash-redhat
+    privileged: true
+    environment:
+      PSEUDO_ROOT_SQUASH: all_squash
+      PSEUDO_ROOT_ANON_PROFILE: redhat
+      EXPORT_SET: all_squash_only
+      ANON_PROFILE_FILTER: redhat
+    volumes:
+      - nfs_data_all_squash_redhat:/exports
+
+  nfs-server-all-squash-windows:
+    build:
+      context: ./nfs-server
+    container_name: nfs-server-all-squash-windows
+    hostname: nfs-server-all-squash-windows
+    privileged: true
+    environment:
+      PSEUDO_ROOT_SQUASH: all_squash
+      PSEUDO_ROOT_ANON_PROFILE: windows
+      EXPORT_SET: all_squash_only
+      ANON_PROFILE_FILTER: windows
+    volumes:
+      - nfs_data_all_squash_windows:/exports
+
+  nfs-server-no-root-squash:
+    build:
+      context: ./nfs-server
+    container_name: nfs-server-no-root-squash
+    hostname: nfs-server-no-root-squash
+    privileged: true
+    environment:
+      PSEUDO_ROOT_SQUASH: no_root_squash
+      EXPORT_SET: no_squash_only
+    volumes:
+      - nfs_data_no_root_squash:/exports
+
+  nfs-client:
+    build:
+      context: ./nfs-client
+    container_name: nfs-client
+    hostname: nfs-client
+    privileged: true
+    depends_on:
+      - nfs-server-root-squash
+      - nfs-server-all-squash-ubuntu
+      - nfs-server-all-squash-redhat
+      - nfs-server-all-squash-windows
+      - nfs-server-no-root-squash
+    environment:
+      NFS_SERVERS: root_squash=nfs-server-root-squash,all_squash_ubuntu=nfs-server-all-squash-ubuntu,all_squash_redhat=nfs-server-all-squash-redhat,all_squash_windows=nfs-server-all-squash-windows,no_root_squash=nfs-server-no-root-squash
+      MOUNT_BASE: /mnt/nfs
+      NFS_EXPORT_BASE: /
+    volumes:
+      - ./:/workspace:ro
+
+volumes:
+  nfs_data_root_squash:
+  nfs_data_all_squash_ubuntu:
+  nfs_data_all_squash_redhat:
+  nfs_data_all_squash_windows:
+  nfs_data_no_root_squash:
