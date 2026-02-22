@@ -25,7 +25,9 @@ RUN mkdir -p /mnt/nfs
 
 COPY entrypoint.sh /entrypoint.sh
 COPY validate_readme_matrix.py /usr/local/bin/validate_readme_matrix.py
+COPY catalystcenter_compatibility_check.py /usr/local/bin/catalystcenter_compatibility_check.py
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /usr/local/bin/validate_readme_matrix.py
+RUN chmod +x /usr/local/bin/catalystcenter_compatibility_check.py
 
 ENTRYPOINT ["/entrypoint.sh"]

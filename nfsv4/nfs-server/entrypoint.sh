@@ -8,7 +8,7 @@ EXPORT_SET="${EXPORT_SET:-all}"
 ANON_PROFILE_FILTER="${ANON_PROFILE_FILTER:-all}"
 PSEUDO_ROOT_ANON_PROFILE="${PSEUDO_ROOT_ANON_PROFILE:-${ANON_PROFILE_FILTER}}"
 
-owners=("root" "ccexportuser")
+owners=("root" "ccexportuser" "ubuntu_anon")
 permissions=("777" "755" "644" "600" "700" "444")
 squash_modes=("all_squash" "root_squash" "no_squash")
 anon_profiles=("ubuntu" "redhat" "windows")
@@ -99,6 +99,25 @@ should_export_anon_profile() {
   esac
 }
 
+owner_ids_for_owner() {
+  local owner="$1"
+  case "${owner}" in
+    root)
+      echo "0:0"
+      ;;
+    ccexportuser)
+      echo "1500:1500"
+      ;;
+    ubuntu_anon)
+      echo "65534:65534"
+      ;;
+    *)
+      echo "Unsupported owner: ${owner}"
+      exit 1
+      ;;
+  esac
+}
+
 pseudo_root_extra_opts=""
 if [ "${pseudo_root_squash_opt}" = "all_squash" ]; then
   pseudo_profile="${PSEUDO_ROOT_ANON_PROFILE}"
@@ -123,7 +142,7 @@ for owner in "${owners[@]}"; do
       if [ "${squash_mode}" = "no_squash" ]; then
         export_dir="${EXPORT_ROOT}/owner_${owner}_perm_${perm}_squash_${squash_mode}"
         mkdir -p "${export_dir}"
-        chown "${owner}:${owner}" "${export_dir}"
+        chown "$(owner_ids_for_owner "${owner}")" "${export_dir}"
         chmod "${perm}" "${export_dir}"
         echo "owner=${owner} mode=${perm} squash=${squash_mode} anon_profile=none" > "${export_dir}/README.txt"
         echo "${export_dir} ${EXPORT_HOSTS}(rw,async,no_subtree_check,no_root_squash,insecure,fsid=${next_fsid})" >> /etc/exports
@@ -137,7 +156,12 @@ for owner in "${owners[@]}"; do
         fi
         export_dir="${EXPORT_ROOT}/owner_${owner}_perm_${perm}_squash_${squash_mode}_anon_${anon_profile}"
         mkdir -p "${export_dir}"
-        chown "${owner}:${owner}" "${export_dir}"
+        if [ "${owner}" = "ubuntu_anon" ]; then
+          anon_ids_for_profile "${anon_profile}"
+          chown "${anon_uid}:${anon_gid}" "${export_dir}"
+        else
+          chown "$(owner_ids_for_owner "${owner}")" "${export_dir}"
+        fi
         chmod "${perm}" "${export_dir}"
 
         case "${squash_mode}" in

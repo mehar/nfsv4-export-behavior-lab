@@ -36,7 +36,7 @@ Client image users:
 - `elasticsearch` uid/gid `1003`
 
 Server export matrix dimensions:
-- Owners: `root`, `ccexportuser`
+- Owners: `root`, `ccexportuser`, `ubuntu_anon`
 - Permissions: `777`, `755`, `644`, `600`, `700`, `444`
 - Squash policies: `all_squash`, `root_squash`, `no_squash`
 - Anonymous profiles (used only with `all_squash` and `root_squash`):
@@ -44,8 +44,8 @@ Server export matrix dimensions:
   - `redhat` anonymous user: `anonuid=65533`, `anongid=65533`
   - `windows` anonymous user: `anonuid=65532`, `anongid=65532`
 
-Per-directory exports: `2 * 6 * ((2 * 3) + 1) = 84`
-Total `/etc/exports` entries at runtime: `85` (`84` per-directory + `1` NFSv3 pseudo-root `/exports`)
+Per-directory exports: `3 * 6 * ((2 * 3) + 1) = 126`
+Total `/etc/exports` entries at runtime: `127` (`126` per-directory + `1` NFSv3 pseudo-root `/exports`)
 
 Export naming format:
 - With anon profile (`all_squash`, `root_squash`):
@@ -57,7 +57,7 @@ NFS mount details:
 - Server exports directories under `/exports` with per-export squash/anon settings
 - Servers run NFSv3 only (NFSv4 disabled in `rpc.nfsd`)
 - Each server includes NFSv3 pseudo-root export `/exports` with `fsid=0,crossmnt`
-- Per-directory exports are assigned unique `fsid` values (`1..84`) on each server
+- Per-directory exports are assigned unique `fsid` values (`1..126`) on each server
 - `rpc.mountd` is started for kernel export/auth handling in this container environment
 - Export routing is intentionally non-overlapping:
   - `root_squash` server exports only `root_squash` entries
@@ -654,3 +654,243 @@ Assumptions used in this table:
 | `owner_ccexportuser_perm_444_squash_no_squash` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via owner bits |
 | `owner_ccexportuser_perm_444_squash_no_squash` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via owner bits |
 | `owner_ccexportuser_perm_444_squash_no_squash` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via owner bits |
+
+### owner=ubuntu_anon, perm=777
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | allowed | allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | allowed | allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | allowed | allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | allowed | allowed | allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | allowed | allowed | allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | allowed | allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_windows` | `maglev (1234:1234)` | allowed | allowed | allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_windows` | `postgres (1001:1001)` | allowed | allowed | allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | allowed | allowed | allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_no_squash` | `root (0:0)` | allowed | allowed | allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_no_squash` | `maglev (1234:1234)` | allowed | allowed | allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_no_squash` | `postgres (1001:1001)` | allowed | allowed | allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_no_squash` | `mongodb (1002:1002)` | allowed | allowed | allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_777_squash_no_squash` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+
+### owner=ubuntu_anon, perm=755
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_no_squash` | `root (0:0)` | allowed | not allowed | allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_no_squash` | `maglev (1234:1234)` | allowed | not allowed | allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_no_squash` | `postgres (1001:1001)` | allowed | not allowed | allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_no_squash` | `mongodb (1002:1002)` | allowed | not allowed | allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_755_squash_no_squash` | `elasticsearch (1003:1003)` | allowed | not allowed | allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+
+### owner=ubuntu_anon, perm=644
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_windows` | `root (0:0)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | not allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | allowed | not allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_windows` | `root (0:0)` | allowed | allowed | not allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_no_squash` | `root (0:0)` | allowed | not allowed | not allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_no_squash` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_no_squash` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_no_squash` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_644_squash_no_squash` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+
+### owner=ubuntu_anon, perm=600
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_windows` | `root (0:0)` | allowed | allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | not allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | allowed | not allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_windows` | `root (0:0)` | allowed | allowed | not allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_windows` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_windows` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_no_squash` | `root (0:0)` | not allowed | not allowed | not allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_no_squash` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_no_squash` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_no_squash` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_600_squash_no_squash` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+
+### owner=ubuntu_anon, perm=700
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | allowed | allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | allowed | allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | allowed | allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_windows` | `root (0:0)` | allowed | allowed | allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_windows` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_windows` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_no_squash` | `root (0:0)` | not allowed | not allowed | not allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_no_squash` | `maglev (1234:1234)` | not allowed | not allowed | not allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_no_squash` | `postgres (1001:1001)` | not allowed | not allowed | not allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_no_squash` | `mongodb (1002:1002)` | not allowed | not allowed | not allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_700_squash_no_squash` | `elasticsearch (1003:1003)` | not allowed | not allowed | not allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+
+### owner=ubuntu_anon, perm=444
+
+| Export Directory | Client User (uid:gid) | Read | Write | Execute | Final Owner (uid:gid) | Comment |
+|---|---|---|---|---|---|---|
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_ubuntu` | `root (0:0)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65534:65534` | server=all_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_redhat` | `root (0:0)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65533:65533` | server=all_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_windows` | `root (0:0)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_all_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `65532:65532` | server=all_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_ubuntu` | `root (0:0)` | allowed | not allowed | not allowed | `65534:65534` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 65534:65534; access via owner bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_ubuntu` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_ubuntu` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_ubuntu` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_ubuntu` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=ubuntu(65534:65534); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_redhat` | `root (0:0)` | allowed | not allowed | not allowed | `65533:65533` | server=root_squash,anon=redhat(65533:65533); client mapped to 65533:65533; access via owner bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_redhat` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=redhat(65533:65533); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_redhat` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=redhat(65533:65533); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_redhat` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=redhat(65533:65533); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_redhat` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=redhat(65533:65533); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_windows` | `root (0:0)` | allowed | not allowed | not allowed | `65532:65532` | server=root_squash,anon=windows(65532:65532); client mapped to 65532:65532; access via owner bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_windows` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=root_squash,anon=windows(65532:65532); client mapped to 1234:1234; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_windows` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=root_squash,anon=windows(65532:65532); client mapped to 1001:1001; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_windows` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=root_squash,anon=windows(65532:65532); client mapped to 1002:1002; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_root_squash_anon_windows` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=root_squash,anon=windows(65532:65532); client mapped to 1003:1003; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_no_squash` | `root (0:0)` | allowed | not allowed | not allowed | `0:0` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_no_squash` | `maglev (1234:1234)` | allowed | not allowed | not allowed | `1234:1234` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_no_squash` | `postgres (1001:1001)` | allowed | not allowed | not allowed | `1001:1001` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_no_squash` | `mongodb (1002:1002)` | allowed | not allowed | not allowed | `1002:1002` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |
+| `owner_ubuntu_anon_perm_444_squash_no_squash` | `elasticsearch (1003:1003)` | allowed | not allowed | not allowed | `1003:1003` | server=no_root_squash,no anon; client uid/gid preserved; access via other bits |

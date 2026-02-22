@@ -8,7 +8,7 @@ MOUNT_OPTS="${MOUNT_OPTS:-vers=3,nolock,soft,timeo=50,retrans=2}"
 MOUNT_RETRIES="${MOUNT_RETRIES:-60}"
 RETRY_INTERVAL_SEC="${RETRY_INTERVAL_SEC:-2}"
 
-owners=("root" "ccexportuser")
+owners=("root" "ccexportuser" "ubuntu_anon")
 permissions=("777" "755" "644" "600" "700" "444")
 squash_modes=("all_squash" "root_squash" "no_squash")
 anon_profiles=("ubuntu" "redhat" "windows")
