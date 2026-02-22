@@ -1,5 +1,18 @@
 # nfsv4-export-behavior-lab
 
+## Why this project exists
+
+NFSv4 export behavior can be hard to reason about when ownership, mode bits, and squash policies interact.
+This lab exists to make those behaviors reproducible and measurable in a controlled Docker environment.
+
+Goals:
+- Validate effective access semantics across `root_squash`, `no_root_squash`, and `all_squash`.
+- Compare anonymous UID/GID mappings (`ubuntu`, `redhat`, `windows`) under identical test cases.
+- Detect mismatches between expected and observed ownership/permission behavior.
+- Provide a repeatable reference setup for debugging and design decisions before production changes.
+
+This repository is intentionally focused on behavior validation, not production deployment patterns.
+
 This setup creates:
 1. Ubuntu-based NFSv4 server container with pseudo-root `root_squash`
 2. Ubuntu-based NFSv4 server container with pseudo-root `no_root_squash`
@@ -60,7 +73,7 @@ NFS mount details:
   - `no_root_squash` -> `nfs-server-no-root-squash`
 - Client mount default options: `vers=4,soft,timeo=50,retrans=2` (override with `MOUNT_OPTS`)
 
-## Why 5-server model
+## Why this uses a 5-server model
 
 We split this into 5 NFS servers because of how NFSv4 export behavior is applied in this containerized test setup.
 
