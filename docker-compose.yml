@@ -1,12 +1,12 @@
-name: nfsv4-export-behavior-lab
+name: nfsv3-export-behavior-lab
 
 services:
   nfs-server-root-squash:
-    image: nfsv4-nfs-server:latest
+    image: nfsv3-nfs-server:latest
     build:
-      context: ./nfsv4/nfs-server
-    container_name: nfs-server-root-squash
-    hostname: nfs-server-root-squash
+      context: ./nfsv3/nfs-server
+    container_name: nfsv3-nfs-server-root-squash
+    hostname: nfsv3-nfs-server-root-squash
     privileged: true
     environment:
       PSEUDO_ROOT_SQUASH: root_squash
@@ -15,11 +15,11 @@ services:
       - nfs_data_root_squash:/exports
 
   nfs-server-all-squash-ubuntu:
-    image: nfsv4-nfs-server:latest
+    image: nfsv3-nfs-server:latest
     build:
-      context: ./nfsv4/nfs-server
-    container_name: nfs-server-all-squash-ubuntu
-    hostname: nfs-server-all-squash-ubuntu
+      context: ./nfsv3/nfs-server
+    container_name: nfsv3-nfs-server-all-squash-ubuntu
+    hostname: nfsv3-nfs-server-all-squash-ubuntu
     privileged: true
     environment:
       PSEUDO_ROOT_SQUASH: all_squash
@@ -30,11 +30,11 @@ services:
       - nfs_data_all_squash_ubuntu:/exports
 
   nfs-server-all-squash-redhat:
-    image: nfsv4-nfs-server:latest
+    image: nfsv3-nfs-server:latest
     build:
-      context: ./nfsv4/nfs-server
-    container_name: nfs-server-all-squash-redhat
-    hostname: nfs-server-all-squash-redhat
+      context: ./nfsv3/nfs-server
+    container_name: nfsv3-nfs-server-all-squash-redhat
+    hostname: nfsv3-nfs-server-all-squash-redhat
     privileged: true
     environment:
       PSEUDO_ROOT_SQUASH: all_squash
@@ -45,11 +45,11 @@ services:
       - nfs_data_all_squash_redhat:/exports
 
   nfs-server-all-squash-windows:
-    image: nfsv4-nfs-server:latest
+    image: nfsv3-nfs-server:latest
     build:
-      context: ./nfsv4/nfs-server
-    container_name: nfs-server-all-squash-windows
-    hostname: nfs-server-all-squash-windows
+      context: ./nfsv3/nfs-server
+    container_name: nfsv3-nfs-server-all-squash-windows
+    hostname: nfsv3-nfs-server-all-squash-windows
     privileged: true
     environment:
       PSEUDO_ROOT_SQUASH: all_squash
@@ -60,11 +60,11 @@ services:
       - nfs_data_all_squash_windows:/exports
 
   nfs-server-no-root-squash:
-    image: nfsv4-nfs-server:latest
+    image: nfsv3-nfs-server:latest
     build:
-      context: ./nfsv4/nfs-server
-    container_name: nfs-server-no-root-squash
-    hostname: nfs-server-no-root-squash
+      context: ./nfsv3/nfs-server
+    container_name: nfsv3-nfs-server-no-root-squash
+    hostname: nfsv3-nfs-server-no-root-squash
     privileged: true
     environment:
       PSEUDO_ROOT_SQUASH: no_root_squash
@@ -73,11 +73,11 @@ services:
       - nfs_data_no_root_squash:/exports
 
   nfs-client:
-    image: nfsv4-nfs-client:latest
+    image: nfsv3-nfs-client:latest
     build:
-      context: ./nfsv4/nfs-client
-    container_name: nfs-client
-    hostname: nfs-client
+      context: ./nfsv3/nfs-client
+    container_name: nfsv3-nfs-client
+    hostname: nfsv3-nfs-client
     privileged: true
     depends_on:
       - nfs-server-root-squash
@@ -86,9 +86,9 @@ services:
       - nfs-server-all-squash-windows
       - nfs-server-no-root-squash
     environment:
-      NFS_SERVERS: root_squash=nfs-server-root-squash,all_squash_ubuntu=nfs-server-all-squash-ubuntu,all_squash_redhat=nfs-server-all-squash-redhat,all_squash_windows=nfs-server-all-squash-windows,no_root_squash=nfs-server-no-root-squash
+      NFS_SERVERS: root_squash=nfsv3-nfs-server-root-squash,all_squash_ubuntu=nfsv3-nfs-server-all-squash-ubuntu,all_squash_redhat=nfsv3-nfs-server-all-squash-redhat,all_squash_windows=nfsv3-nfs-server-all-squash-windows,no_root_squash=nfsv3-nfs-server-no-root-squash
       MOUNT_BASE: /mnt/nfs
-      NFS_EXPORT_BASE: /
+      NFS_EXPORT_BASE: /exports
     volumes:
       - ./:/workspace:ro
 
