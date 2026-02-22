@@ -2,8 +2,9 @@ name: nfsv4-export-behavior-lab
 
 services:
   nfs-server-root-squash:
+    image: nfsv4-nfs-server:latest
     build:
-      context: ./nfs-server
+      context: ./nfsv4/nfs-server
     container_name: nfs-server-root-squash
     hostname: nfs-server-root-squash
     privileged: true
@@ -14,8 +15,9 @@ services:
       - nfs_data_root_squash:/exports
 
   nfs-server-all-squash-ubuntu:
+    image: nfsv4-nfs-server:latest
     build:
-      context: ./nfs-server
+      context: ./nfsv4/nfs-server
     container_name: nfs-server-all-squash-ubuntu
     hostname: nfs-server-all-squash-ubuntu
     privileged: true
@@ -28,8 +30,9 @@ services:
       - nfs_data_all_squash_ubuntu:/exports
 
   nfs-server-all-squash-redhat:
+    image: nfsv4-nfs-server:latest
     build:
-      context: ./nfs-server
+      context: ./nfsv4/nfs-server
     container_name: nfs-server-all-squash-redhat
     hostname: nfs-server-all-squash-redhat
     privileged: true
@@ -42,8 +45,9 @@ services:
       - nfs_data_all_squash_redhat:/exports
 
   nfs-server-all-squash-windows:
+    image: nfsv4-nfs-server:latest
     build:
-      context: ./nfs-server
+      context: ./nfsv4/nfs-server
     container_name: nfs-server-all-squash-windows
     hostname: nfs-server-all-squash-windows
     privileged: true
@@ -56,8 +60,9 @@ services:
       - nfs_data_all_squash_windows:/exports
 
   nfs-server-no-root-squash:
+    image: nfsv4-nfs-server:latest
     build:
-      context: ./nfs-server
+      context: ./nfsv4/nfs-server
     container_name: nfs-server-no-root-squash
     hostname: nfs-server-no-root-squash
     privileged: true
@@ -68,8 +73,9 @@ services:
       - nfs_data_no_root_squash:/exports
 
   nfs-client:
+    image: nfsv4-nfs-client:latest
     build:
-      context: ./nfs-client
+      context: ./nfsv4/nfs-client
     container_name: nfs-client
     hostname: nfs-client
     privileged: true
