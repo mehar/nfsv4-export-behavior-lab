@@ -40,6 +40,7 @@ docker compose down
 - NFSv3 setup details, assumptions, and matrix: `nfsv3/README.md`
 - NFSv4 setup details, assumptions, and matrix: `nfsv4/README.md`
 - Current `docker-compose.yml` targets the NFSv3 implementation paths.
+- Both NFSv3 and NFSv4 lab images are based on Ubuntu 18.04.
 
 ## Validate By Version
 

@@ -16,12 +16,12 @@ Goals:
 This repository is intentionally focused on behavior validation, not production deployment patterns.
 
 This setup creates:
-1. Ubuntu-based NFSv3 server container with pseudo-root `root_squash`
-2. Ubuntu-based NFSv3 server container with pseudo-root `no_root_squash`
-3. Ubuntu-based NFSv3 server container for `all_squash` + ubuntu anon mapping (`65534:65534`)
-4. Ubuntu-based NFSv3 server container for `all_squash` + redhat anon mapping (`65533:65533`)
-5. Ubuntu-based NFSv3 server container for `all_squash` + windows anon mapping (`65532:65532`)
-6. Ubuntu-based NFS client container mounting all exports from the appropriate server
+1. Ubuntu 18.04-based NFSv3 server container with pseudo-root `root_squash`
+2. Ubuntu 18.04-based NFSv3 server container with pseudo-root `no_root_squash`
+3. Ubuntu 18.04-based NFSv3 server container for `all_squash` + ubuntu anon mapping (`65534:65534`)
+4. Ubuntu 18.04-based NFSv3 server container for `all_squash` + redhat anon mapping (`65533:65533`)
+5. Ubuntu 18.04-based NFSv3 server container for `all_squash` + windows anon mapping (`65532:65532`)
+6. Ubuntu 18.04-based NFS client container mounting all exports from the appropriate server
 
 ## What gets created
 
