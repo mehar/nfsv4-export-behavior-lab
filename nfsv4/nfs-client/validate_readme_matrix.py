@@ -6,8 +6,6 @@ It reads the matrix table rows from README and checks each row by
 executing operations as the declared client user.
 """
 
-from __future__ import annotations
-
 import argparse
 import os
 import re
@@ -17,7 +15,7 @@ import sys
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 
 ROW_PREFIX = "| `owner_"
@@ -105,8 +103,9 @@ def run_as_user(user: str, command: str, timeout_sec: int) -> CmdResult:
     try:
         proc = subprocess.run(
             cmd,
-            text=True,
-            capture_output=True,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=timeout_sec,
         )
         return CmdResult(
@@ -164,8 +163,9 @@ def expected_server_label(export_dir: str) -> str:
 def get_mount_source(path: Path, timeout_sec: int) -> Optional[str]:
     proc = subprocess.run(
         ["findmnt", "-T", str(path), "-n", "-o", "SOURCE"],
-        text=True,
-        capture_output=True,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         timeout=timeout_sec,
     )
     if proc.returncode != 0:
@@ -176,7 +176,7 @@ def get_mount_source(path: Path, timeout_sec: int) -> Optional[str]:
     return source
 
 
-def check_passes_with_policy(row: MatrixRow, expected_allowed: bool, actual_allowed: bool) -> tuple[bool, str]:
+def check_passes_with_policy(row: MatrixRow, expected_allowed: bool, actual_allowed: bool) -> Tuple[bool, str]:
     # User-requested policy: if root is denied access, count it as success.
     if row.user == "root" and not actual_allowed:
         return True, "root-denied override"
@@ -189,7 +189,7 @@ def check_passes_with_policy(row: MatrixRow, expected_allowed: bool, actual_allo
     return False, "mismatch"
 
 
-def owner_passes_with_policy(row: MatrixRow, expected_owner: str, actual_owner: str) -> tuple[bool, str]:
+def owner_passes_with_policy(row: MatrixRow, expected_owner: str, actual_owner: str) -> Tuple[bool, str]:
     if actual_owner == expected_owner:
         return True, "matched expectation"
     anon_match = ANON_RE.search(row.comment)
@@ -206,7 +206,7 @@ def owner_passes_with_policy(row: MatrixRow, expected_owner: str, actual_owner: 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate README matrix rows against mounted exports")
-    parser.add_argument("--readme", default="/workspace/README.md", help="Path to README with matrix table")
+    parser.add_argument("--readme", default="/workspace/nfsv4/README.md", help="Path to README with matrix table")
     parser.add_argument("--mount-base", default="/mnt/nfs", help="Base mount path in client container")
     parser.add_argument(
         "--mount-bases",

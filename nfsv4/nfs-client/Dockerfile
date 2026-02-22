@@ -1,12 +1,15 @@
-FROM ubuntu:22.04
+FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        nfs-common \
+       netbase \
        netcat-openbsd \
+       python3-pip \
        python3 \
+    && pip3 install --no-cache-dir dataclasses \
     && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -g 1234 maglev \
